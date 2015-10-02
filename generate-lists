@@ -1,0 +1,7 @@
+#!/bin/bash
+cat list.csv | grep CMH | grep h > list_h-cmh.csv
+cat list.csv | grep CMH | grep p > list_p-cmh.csv
+cat list.csv | grep MRC | grep h > list_h-mrc.csv
+cat list.csv | grep MRC | grep p > list_p-mrc.csv
+cat list.csv | grep ZHH | grep h > list_h-zhh.csv
+cat list.csv | grep ZHH | grep p > list_p-zhh.csv
