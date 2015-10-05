@@ -1,0 +1,42 @@
+3dANOVA3 -type 5 -alevels 2 -blevels 2 -clevels 9 \
+    -dset 1 1 1 SPN01_MRC_0015_01_IM.nii.gz[67] \
+    -dset 1 2 1 SPN01_MRC_0015_01_OB.nii.gz[67] \
+    -dset 1 1 2 SPN01_MRC_0016_01_IM.nii.gz[67] \
+    -dset 1 2 2 SPN01_MRC_0016_01_OB.nii.gz[67] \
+    -dset 1 1 3 SPN01_MRC_0019_01_IM.nii.gz[67] \
+    -dset 1 2 3 SPN01_MRC_0019_01_OB.nii.gz[67] \
+    -dset 1 1 4 SPN01_MRC_0020_01_IM.nii.gz[67] \
+    -dset 1 2 4 SPN01_MRC_0020_01_OB.nii.gz[67] \
+    -dset 1 1 5 SPN01_MRC_0021_01_IM.nii.gz[67] \
+    -dset 1 2 5 SPN01_MRC_0021_01_OB.nii.gz[67] \
+    -dset 1 1 6 SPN01_MRC_0023_01_IM.nii.gz[67] \
+    -dset 1 2 6 SPN01_MRC_0023_01_OB.nii.gz[67] \
+    -dset 1 1 7 SPN01_MRC_0024_01_IM.nii.gz[67] \
+    -dset 1 2 7 SPN01_MRC_0024_01_OB.nii.gz[67] \
+    -dset 1 1 8 SPN01_MRC_0025_01_IM.nii.gz[67] \
+    -dset 1 2 8 SPN01_MRC_0025_01_OB.nii.gz[67] \
+    -dset 1 1 9 SPN01_MRC_0026_01_IM.nii.gz[67] \
+    -dset 1 2 9 SPN01_MRC_0026_01_OB.nii.gz[67] \
+    -dset 2 1 1 SPN01_MRC_0001_01_IM.nii.gz[67] \
+    -dset 2 2 1 SPN01_MRC_0001_01_OB.nii.gz[67] \
+    -dset 2 1 2 SPN01_MRC_0002_01_IM.nii.gz[67] \
+    -dset 2 2 2 SPN01_MRC_0002_01_OB.nii.gz[67] \
+    -dset 2 1 3 SPN01_MRC_0006_01_IM.nii.gz[67] \
+    -dset 2 2 3 SPN01_MRC_0006_01_OB.nii.gz[67] \
+    -dset 2 1 4 SPN01_MRC_0004_01_IM.nii.gz[67] \
+    -dset 2 2 4 SPN01_MRC_0004_01_OB.nii.gz[67] \
+    -dset 2 1 5 SPN01_MRC_0005_01_IM.nii.gz[67] \
+    -dset 2 2 5 SPN01_MRC_0005_01_OB.nii.gz[67] \
+    -dset 2 1 6 SPN01_MRC_0008_01_IM.nii.gz[67] \
+    -dset 2 2 6 SPN01_MRC_0008_01_OB.nii.gz[67] \
+    -dset 2 1 7 SPN01_MRC_0007_01_IM.nii.gz[67] \
+    -dset 2 2 7 SPN01_MRC_0007_01_OB.nii.gz[67] \
+    -dset 2 1 8 SPN01_MRC_0012_01_IM.nii.gz[67] \
+    -dset 2 2 8 SPN01_MRC_0012_01_OB.nii.gz[67] \
+    -dset 2 1 9 SPN01_MRC_0009_01_IM.nii.gz[67] \
+    -dset 2 2 9 SPN01_MRC_0009_01_OB.nii.gz[67] \
+-fa group -fb cond -fab groupXcond \
+-acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \
+-acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \
+-Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \
+-bucket ANOVA-mrc.nii.gz
