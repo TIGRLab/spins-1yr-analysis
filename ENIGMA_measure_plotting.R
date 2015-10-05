@@ -3,8 +3,9 @@ library("ggplot2", lib.loc="/opt/quarantine/R-extras/3.1.1/build")
 ## read in the data
 setwd("/projects/edickie/code/spins-1yr-analysis")
 subjects <- read.table("list.csv", quote="\"")
-LandRvolumes <- read.csv("/projects/edickie/analysis/freesurfer_QA/SPINS/LandRvolumes.csv")
 
+## freesurfer derived measures
+LandRvolumes <- read.csv("/projects/edickie/analysis/freesurfer_QA/SPINS/LandRvolumes.csv")
 CorticalMeasuresENIGMA_ThickAvg <- read.csv("/projects/edickie/analysis/freesurfer_QA/SPINS/CorticalMeasuresENIGMA_ThickAvg.csv")
 CorticalMeasuresENIGMA_SurfAvg <- read.csv("/projects/edickie/analysis/freesurfer_QA/SPINS/CorticalMeasuresENIGMA_SurfAvg.csv")
 
