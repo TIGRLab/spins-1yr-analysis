@@ -1,0 +1,46 @@
+3dANOVA3 -type 5 -alevels 2 -blevels 2 -clevels 10 \
+    -dset 1 1 1 SPN01_ZHH_0001_01_IM.nii.gz[67] \
+    -dset 1 2 1 SPN01_ZHH_0001_01_OB.nii.gz[67] \
+    -dset 1 1 2 SPN01_ZHH_0002_01_IM.nii.gz[67] \
+    -dset 1 2 2 SPN01_ZHH_0002_01_OB.nii.gz[67] \
+    -dset 1 1 3 SPN01_ZHH_0003_01_IM.nii.gz[67] \
+    -dset 1 2 3 SPN01_ZHH_0003_01_OB.nii.gz[67] \
+    -dset 1 1 4 SPN01_ZHH_0004_01_IM.nii.gz[67] \
+    -dset 1 2 4 SPN01_ZHH_0004_01_OB.nii.gz[67] \
+    -dset 1 1 5 SPN01_ZHH_0005_01_IM.nii.gz[67] \
+    -dset 1 2 5 SPN01_ZHH_0005_01_OB.nii.gz[67] \
+    -dset 1 1 6 SPN01_ZHH_0006_01_IM.nii.gz[67] \
+    -dset 1 2 6 SPN01_ZHH_0006_01_OB.nii.gz[67] \
+    -dset 1 1 7 SPN01_ZHH_0007_01_IM.nii.gz[67] \
+    -dset 1 2 7 SPN01_ZHH_0007_01_OB.nii.gz[67] \
+    -dset 1 1 8 SPN01_ZHH_0008_01_IM.nii.gz[67] \
+    -dset 1 2 8 SPN01_ZHH_0008_01_OB.nii.gz[67] \
+    -dset 1 1 9 SPN01_ZHH_0009_01_IM.nii.gz[67] \
+    -dset 1 2 9 SPN01_ZHH_0009_01_OB.nii.gz[67] \
+    -dset 1 1 10 SPN01_ZHH_0010_01_IM.nii.gz[67] \
+    -dset 1 2 10 SPN01_ZHH_0010_01_OB.nii.gz[67] \
+    -dset 2 1 1 SPN01_ZHH_0012_01_IM.nii.gz[67] \
+    -dset 2 2 1 SPN01_ZHH_0012_01_OB.nii.gz[67] \
+    -dset 2 1 2 SPN01_ZHH_0013_01_IM.nii.gz[67] \
+    -dset 2 2 2 SPN01_ZHH_0013_01_OB.nii.gz[67] \
+    -dset 2 1 3 SPN01_ZHH_0014_01_IM.nii.gz[67] \
+    -dset 2 2 3 SPN01_ZHH_0014_01_OB.nii.gz[67] \
+    -dset 2 1 4 SPN01_ZHH_0015_01_IM.nii.gz[67] \
+    -dset 2 2 4 SPN01_ZHH_0015_01_OB.nii.gz[67] \
+    -dset 2 1 5 SPN01_ZHH_0017_01_IM.nii.gz[67] \
+    -dset 2 2 5 SPN01_ZHH_0017_01_OB.nii.gz[67] \
+    -dset 2 1 6 SPN01_ZHH_0018_01_IM.nii.gz[67] \
+    -dset 2 2 6 SPN01_ZHH_0018_01_OB.nii.gz[67] \
+    -dset 2 1 7 SPN01_ZHH_0021_01_IM.nii.gz[67] \
+    -dset 2 2 7 SPN01_ZHH_0021_01_OB.nii.gz[67] \
+    -dset 2 1 8 SPN01_ZHH_0022_01_IM.nii.gz[67] \
+    -dset 2 2 8 SPN01_ZHH_0022_01_OB.nii.gz[67] \
+    -dset 2 1 9 SPN01_ZHH_0028_01_IM.nii.gz[67] \
+    -dset 2 2 9 SPN01_ZHH_0028_01_OB.nii.gz[67] \
+    -dset 2 1 10 SPN01_ZHH_0030_01_IM.nii.gz[67] \
+    -dset 2 2 10 SPN01_ZHH_0030_01_OB.nii.gz[67] \
+-fa group -fb cond -fab groupXcond \
+-acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \
+-acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \
+-Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \
+-bucket ANOVA-zhh.nii.gz

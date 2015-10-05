@@ -1,0 +1,16 @@
+#!/bin/bash
+cat list.csv | grep CMH | grep h > list_h-cmh.csv
+cat list.csv | grep CMH | grep p > list_p-cmh.csv
+cat list.csv | grep MRC | grep h > list_h-mrc.csv
+cat list.csv | grep MRC | grep p > list_p-mrc.csv
+cat list.csv | grep ZHH | grep h > list_h-zhh.csv
+cat list.csv | grep ZHH | grep p > list_p-zhh.csv
+
+# create master list (from curated lists ... not done automatically)
+cat list_im-h-cmh.csv >  list_im-h-allsites.csv
+cat list_im-h-mrc.csv >> list_im-h-allsites.csv
+cat list_im-h-zhh.csv >> list_im-h-allsites.csv
+cat list_im-p-cmh.csv >  list_im-p-allsites.csv
+cat list_im-p-mrc.csv >> list_im-p-allsites.csv
+cat list_im-p-zhh.csv >> list_im-p-allsites.csv
+

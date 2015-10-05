@@ -1,0 +1,10 @@
+#!/bin/bash
+archivedir='/archive/data-2.0/SPINS/data/imob'
+workingdir='/projects/jdv/data/spins/1yr/imob'
+
+for subj in $(ls -d ${archivedir}/*); do
+    subjname=$(basename ${subj})
+    ln -s ${subj}/*_IM_1stlvl.nii.gz ${workingdir}/${subjname}_IM.nii.gz
+    ln -s ${subj}/*_OB_1stlvl.nii.gz ${workingdir}/${subjname}_OB.nii.gz
+    ln -s ${subj}/*_mask_MNI.nii.gz ${workingdir}/${subjname}_mask.nii.gz
+done
