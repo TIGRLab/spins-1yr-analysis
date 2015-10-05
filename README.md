@@ -1,5 +1,4 @@
-**SPINS 1yr analysis scripts**
+**SPINS 1yr analysis**
 
-+ list.csv -- participants and diagnosis to include (h = control, p = patient, x = exclude)
-
-Data can be found in /projects/jdv/data/spins/1yr or /archive/data-2.0/SPINS/data
++ bin/ contains the scripts to run all analysis on the data.
++ outputs/bin/list.csv - type files are used to define the participants for different analysis (e.g., using an equal subset of patients/controls in a single site, or combining these subsets across sites)... (h = control, p = patient, x = exclude).
