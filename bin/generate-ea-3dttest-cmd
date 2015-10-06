@@ -1,0 +1,37 @@
+#!/bin/bash
+sites=( cmh zhh mrc allsites )
+for site in ${sites[@]}; do
+
+    filename='run-glm_EA_'${site}'.sh'
+    nsubjpergroup=$(cat list_ea-h-${site}.csv | wc -l)
+
+    # healthy - schizophrenia
+    echo '3dttest++ -setA healthy \' > ${filename}
+    while read line; do 
+        echo "    "${line}" "${line}"_01_EA.nii.gz'"[3]"'" '\' >> ${filename}
+    done < list_ea-h-${site}.csv
+    echo '    -setB schizophrenia \' >> ${filename}
+    while read line; do 
+        echo "    "${line}" "${line}"_01_EA.nii.gz'"[3]"'" '\' >> ${filename}
+    done < list_ea-p-${site}.csv
+    echo '    -prefix ttest_HC-SZ_modulator-'${site}'.nii.gz' >> ${filename} 
+    
+    # healthy
+    echo '' >> ${filename}
+    echo '3dttest++ -setA healthy \' >> ${filename}
+    while read line; do 
+        echo "    "${line}" "${line}"_01_EA.nii.gz'"[3]"'" '\' >> ${filename}
+    done < list_ea-h-${site}.csv
+    echo '    -prefix ttest_HC_modulator-'${site}'.nii.gz' >> ${filename} 
+    
+    # schizophrenia
+    echo '' >> ${filename}
+    echo '3dttest++ -setA schizophrenia \' >> ${filename}
+    while read line; do 
+        echo "    "${line}" "${line}"_01_EA.nii.gz'"[3]"'" '\' >> ${filename}
+    done < list_ea-p-${site}.csv
+    echo '    -prefix ttest_SZ_modulator-'${site}'.nii.gz' >> ${filename}
+
+    chmod 755 ${filename}
+done
+
