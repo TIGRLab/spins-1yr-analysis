@@ -14,3 +14,10 @@ cat list_im-p-cmh.csv >  list_im-p-allsites.csv
 cat list_im-p-mrc.csv >> list_im-p-allsites.csv
 cat list_im-p-zhh.csv >> list_im-p-allsites.csv
 
+# duplicate imitate-observe lists for ea
+for list in $(ls list_im*); 
+    do newname=$(echo ${list} | sed s/im/ea/g)
+    echo cp ${list} ${newname}
+done
+
+
