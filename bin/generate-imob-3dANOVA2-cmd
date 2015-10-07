@@ -5,7 +5,7 @@ for site in ${sites[@]}; do
     filename='run-glm_IMOB_'${site}'.sh'
     nsubjpergroup=$(cat list_im-h-${site}.csv | wc -l)
     # set up the analysis
-    echo '3dANOVA3 -type 5 -alevels 2 -blevels 2 -clevels '${nsubjpergroup}' \' > ${filename}
+    echo '3dANOVA3 -DAFNI_FLOATIZE=YES -type 5 -alevels 2 -blevels 2 -clevels '${nsubjpergroup}' \' > ${filename}
 
     # add healthy subjects
     count=1
@@ -28,6 +28,7 @@ for site in ${sites[@]}; do
     echo '-acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \' >> ${filename}
     echo '-acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \' >> ${filename}
     echo '-Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \' >> ${filename}
+    echo '-aBcontr 1 -1 : 1 HCvsSC_IM -aBcontr 1 -1 : 2 HCvsSC_OB \' >> ${filename}
     echo '-bucket ANOVA-'${site}'.nii.gz' >> ${filename}
 
     chmod 755 ${filename}

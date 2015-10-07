@@ -1,4 +1,4 @@
-3dANOVA3 -type 5 -alevels 2 -blevels 2 -clevels 10 \
+3dANOVA3 -DAFNI_FLOATIZE=YES -type 5 -alevels 2 -blevels 2 -clevels 10 \
     -dset 1 1 1 SPN01_ZHH_0001_01_IM.nii.gz[67] \
     -dset 1 2 1 SPN01_ZHH_0001_01_OB.nii.gz[67] \
     -dset 1 1 2 SPN01_ZHH_0002_01_IM.nii.gz[67] \
@@ -43,4 +43,5 @@
 -acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \
 -acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \
 -Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \
+-aBcontr 1 -1 : 1 HCvsSC_IM -aBcontr 1 -1 : 2 HCvsSC_OB \
 -bucket ANOVA-zhh.nii.gz
