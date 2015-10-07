@@ -168,7 +168,7 @@ ggplot(results_volumes_resICV, aes(x = ROI,
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Volumes (ICV residualized)")
-
+ggsave('ResidVolume_ROIresults.png',width=9,height=7)
 
 results_volumes_raw <- run_many_lm(volumes.melted,'site','ROI','Volume ~ Dx')
 ggplot(results_volumes_raw, aes(x = ROI, 
@@ -180,6 +180,7 @@ ggplot(results_volumes_raw, aes(x = ROI,
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Volumes (raw)")
+ggsave('RawVolume_ROIresults.png',width=9,height=7)
 
 ################################## now for thinkness
 thickness <- merge(subjects,CorticalMeasuresENIGMA_ThickAvg,by="SubjID")
@@ -227,7 +228,7 @@ ggplot(results_thickness_resICV_nopooled
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Thickness (resid)")
-
+ggsave('ResidThickness_ROIresults.png',width=20,height=8)
 
 results_thickness_raw <- run_many_lm(thickness.melted,'site','ROI','Thickness ~ Dx')
 results_thickness_raw_nopooled <-subset(results_thickness_raw, 
@@ -241,7 +242,7 @@ ggplot(results_thickness_raw_nopooled, aes(x = ROI,
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Thickness (raw)")
-
+ggsave('RawThickness_ROIresults.png',width=20,height=8)
 
 ################################## now for Surface Area
 surfarea <- merge(subjects,CorticalMeasuresENIGMA_SurfAvg,by="SubjID")
@@ -277,7 +278,7 @@ surfarea.melted <- melt(surfarea[ ,c(names(subjects),surfarea.ROIs)],
 results_surfarea_resICV <- run_many_lm(surfareaICV.melted,'site','ROI','surfarea_ICVresid ~ Dx')
 results_surfarea_resICV_nopooled <-subset(results_surfarea_resICV, 
                                        ROI != "LThickness" & ROI != "RThickness" & ROI != "LSurfArea" & ROI != "RSurfArea")
-ggplot(results_surfarea_resICV, aes(x = ROI, 
+ggplot(results_surfarea_resICV_nopooled, aes(x = ROI, 
                                      y = beta, 
                                      size = -log(p.value, base =10), 
                                      shape = p0.5, 
@@ -286,7 +287,7 @@ ggplot(results_surfarea_resICV, aes(x = ROI,
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Surface Area (resid)")
-
+ggsave('ResidSurfArea_ROIresults.png',width=20,height=8)
 
 results_surfarea_raw <- run_many_lm(surfarea.melted,'site','ROI','surfarea ~ Dx')
 results_surfarea_raw_nopooled <-subset(results_surfarea_raw, 
@@ -296,3 +297,42 @@ ggplot(results_surfarea_raw_nopooled, aes(x = ROI, y = beta, size = -log(p.value
   geom_hline(aes(yintercept=0)) + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   ggtitle("beta coefficients and p-values for independent tests across site/ROI for Surface Area (raw)")
+ggsave('RawSurfArea_ROIresults.png',width=20,height=8)
+
+###plot only surface area and thickness stuff
+thick_raw_pooled <- subset(thickness.melted, 
+                               ROI == "LThickness" | ROI == "RThickness")
+## box plot thing of the ICV
+ggplot(thick_raw_pooled, aes(x=Dx, y=Thickness)) +
+  geom_boxplot(outlier.shape = NA) + 
+  geom_jitter(position = position_jitter(width = .1), size=3, aes(color=site)) +
+  facet_wrap(~ROI) + labs(y="Thickness (raw)")
+ggsave('RawAllThickness_boxplot.png',width=6,height=5)
+
+thick_ICV_pooled <- subset(thicknessICV.melted, 
+                           ROI == "LThickness" | ROI == "RThickness")
+## box plot thing of the ICV
+ggplot(thick_ICV_pooled, aes(x=Dx, y=Thickness_ICVresid)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = .1), size=3, aes(color=site)) +
+  facet_wrap(~ROI) + labs(y="Thickness (resid. for ICV)")
+ggsave('ResidAllThickness_boxplot.png',width=6,height=5)
+
+##### for surface area
+sa_raw_pooled <- subset(surfarea.melted, 
+                           ROI == "LSurfArea" | ROI == "RSurfArea")
+## box plot thing of the ICV
+ggplot(sa_raw_pooled, aes(x=Dx, y=surfarea)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = .1), size=3, aes(color=site)) +
+  facet_wrap(~ROI) + labs(y="Surface Area (raw)")
+ggsave('RawAllSurfaceArea_boxplot.png',width=6,height=5)
+
+sa_ICV_pooled <- subset(surfareaICV.melted, 
+                        ROI == "LSurfArea" | ROI == "RSurfArea")
+## box plot thing of the ICV
+ggplot(sa_ICV_pooled, aes(x=Dx, y=surfarea_ICVresid)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = .1), size=3, aes(color=site)) +
+  facet_wrap(~ROI) + labs(y="Surface Area (residualized for ICV)")
+ggsave('ResidAllSurfaceArea_boxplot.png',width=6,height=5)
