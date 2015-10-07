@@ -41,7 +41,7 @@ p.resid = as.data.frame(p.resid)
 sig.resid = subset(p.resid, fdr < 0.05)
 
 df.sig.resid = subset(df, ROI %in% rownames(sig.resid))
-ggplot(data = df.sig.resid, aes(x=site, y=FA_resid, colour=dx)) + geom_boxplot() + facet_wrap(~ROI)
+#ggplot(data = df.sig.resid, aes(x=site, y=FA_resid, colour=dx)) + geom_boxplot() + facet_wrap(~ROI)
 
 # independant 
 p.value = c()
@@ -77,5 +77,5 @@ ggplot(df.ind, aes(x = roi,
                    color = as.factor(site))) + 
   geom_point() + 
   geom_hline(aes(yintercept=0)) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
-
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("beta coefficients and p-values for independent tests across site/ROI")
