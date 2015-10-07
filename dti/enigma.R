@@ -41,7 +41,10 @@ p.resid = as.data.frame(p.resid)
 sig.resid = subset(p.resid, fdr < 0.05)
 
 df.sig.resid = subset(df, ROI %in% rownames(sig.resid))
-#ggplot(data = df.sig.resid, aes(x=site, y=FA_resid, colour=dx)) + geom_boxplot() + facet_wrap(~ROI)
+ggplot(data = df.sig.resid, aes(x=dx, y=FA_resid, colour=dx)) + 
+  geom_boxplot() +
+  facet_wrap(~ROI) + 
+  ggtitle("Case/control comparison after residualising for site, and FDR correction")
 
 # independant 
 p.value = c()
