@@ -102,6 +102,27 @@ run_many_lm <- function(df,splitvar1,splitvar2,lmformula) {
   return(df.ind)
 }
 
+# residuals of FA ~ site
+
+residualize.nested <- function(df,splitvar1,splitvar2,lmformula,residvarname) {
+  myformula = formula(lmformula)
+  mycolnames <- c(names(df),residvarname)
+  results <- df
+  results$residuals <- NA
+  results <- NULL
+  for (site_x in levels(df[ ,c(splitvar1)])) {
+    site_df = subset(df, df[ ,c(splitvar1)] == site_x)
+    for (ROI_x in levels(df[ ,c(splitvar2)])) {
+      roi_df = subset(site_df, site_df[,c(splitvar2)] == ROI_x)      
+      roi_df$residuals =  resid(lm(myformula, roi_df)) 
+      names(roi_df) <- mycolnames
+      results <- rbind(results,roi_df) 
+    }
+  }
+  names(results) <- mycolnames
+  return(results)
+}
+
 
 ## run residualize_ICV separately for each site them recombine 
 vols_CMH <- subset(volumes, site=="CMH")
@@ -135,12 +156,19 @@ volumesICV.melted <- melt(volumes_resICV[ ,c(names(subjects),volume.ROIs)],
                           variable.name="ROI",
                           value.name="Volume_ICVresid")
 
-volumes.melted <- melt(volumes[ ,c(names(subjects),volume.ROIs)],
-                          id.vars=names(subjects),
+volumes.melted <- melt(volumes[ ,c(names(subjects),volume.ROIs,'ICV')],
+                          id.vars=c(names(subjects),'ICV'),
                           measure.vars=volume.ROIs,
                           variable.name="ROI",
                           value.name="Volume")
 
+volumes.melted <- residualize.nested(volumes.melted,"site","ROI",'Volume ~ 1 + ICV','Volume_ICVresid2') 
+checkresid <- cbind(volumes.melted,volumesICV.melted)
+df=volumes.melted
+splitvar1 = "site"
+splitvar2 = "ROI"
+lmformula = 'Volume ~ 1 + ICV'
+residvarname = "Volume_ICVresid2"
 ### adding pretty labels for graphs
 volumesICV.melted$Hemisphere <- NA
 volumesICV.melted$Hemisphere[substring(volumesICV.melted$ROI,1,1)=="L"] <- "Left"
