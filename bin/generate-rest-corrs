@@ -1,0 +1,18 @@
+#!/bin/bash
+
+datadir='/projects/jdv/data/spins/1yr/data/rest'
+
+3dUndump -prefix anat_dmn_seed.nii.gz -xyz -master ${datadir}/SPN01_CMH_0001_01_REST.nii.gz -srad 6 dmn.labels
+
+while read line; do
+    3dmaskave -mask anat_dmn_seed.nii.gz -quiet ${datadir}/${line}_01_REST.nii.gz > ${datadir}/${line}_01_SEED.1D
+    3dTcorr1D -prefix ${datadir}/${line}_01_CORR.nii.gz ${datadir}/${line}_01_REST.nii.gz ${datadir}/${line}_01_SEED.1D
+done < list_im-h-allsites.csv
+
+while read line; do
+    3dmaskave -mask anat_dmn_seed.nii.gz -quiet ${datadir}/${line}_01_REST.nii.gz > ${datadir}/${line}_01_SEED.1D
+    3dTcorr1D -prefix ${datadir}/${line}_01_CORR.nii.gz ${datadir}/${line}_01_REST.nii.gz ${datadir}/${line}_01_SEED.1D
+done < list_im-p-allsites.csv
+
+
+

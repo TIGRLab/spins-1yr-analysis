@@ -1,0 +1,11 @@
+#!/bin/bash
+archivedir='/archive/data-2.0/SPINS/data/rest'
+workingdir='/projects/jdv/data/spins/1yr/data/rest'
+
+for subj in $(ls -d ${archivedir}/*); do
+    subjname=$(basename ${subj})
+    ln -s ${subj}/*REST.01.nii.gz ${workingdir}/${subjname}_REST.nii.gz
+    ln -s ${subj}/*_mask_MNI.nii.gz ${workingdir}/${subjname}_mask.nii.gz
+    ln -s ${subj}/*_roi-corrs.csv ${workingdir}/${subjname}_graph.csv
+done
+

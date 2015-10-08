@@ -39,9 +39,5 @@
     -dset 2 2 9 SPN01_ZHH_0028_01_OB.nii.gz[67] \
     -dset 2 1 10 SPN01_ZHH_0030_01_IM.nii.gz[67] \
     -dset 2 2 10 SPN01_ZHH_0030_01_OB.nii.gz[67] \
--fa group -fb cond -fab groupXcond \
--acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \
--acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \
--Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \
--aBcontr 1 -1 : 1 HCvsSC_IM -aBcontr 1 -1 : 2 HCvsSC_OB \
--bucket ANOVA-zhh.nii.gz
+-fa group -fb cond -fab groupXcond -acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB -acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB -Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC -aBcontr 1 -1 : 1 HCvsSC_IM -aBcontr 1 -1 : 2 HCvsSC_OB -aBcontr 1  0 : 1 HC_IM -aBcontr 0  1 : 1 SC_IM -aBcontr 1  0 : 2 HC_OB -aBcontr 0  1 : 2 SC_OB -bucket ANOVA-zhh.nii.gz
+

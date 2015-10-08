@@ -24,12 +24,27 @@ for site in ${sites[@]}; do
     done < list_im-p-${site}.csv
 
     # finish off the analysis
-    echo '-fa group -fb cond -fab groupXcond \' >> ${filename}
-    echo '-acontr 1 0 HC -acontr 0 1 SC -bcontr 1 0 IM -bcontr 0 1 OB \' >> ${filename}
-    echo '-acontr 1 -1 HCvsSC -bcontr 1 -1 IMvsOB \' >> ${filename}
-    echo '-Abcontr 1 : 1 -1 IMvsOB_HC -Abcontr 2 : 1 -1 IMvsOB_SC \' >> ${filename}
-    echo '-aBcontr 1 -1 : 1 HCvsSC_IM -aBcontr 1 -1 : 2 HCvsSC_OB \' >> ${filename}
-    echo '-bucket ANOVA-'${site}'.nii.gz' >> ${filename}
+    cat <<EOF >> ${filename}
+-fa group \
+-fb cond \
+-fab groupXcond \
+-acontr 1 0 HC \
+-acontr 0 1 SC \
+-bcontr 1 0 IM \
+-bcontr 0 1 OB \
+-acontr 1 -1 HCvsSC \
+-bcontr 1 -1 IMvsOB \
+-Abcontr 1 : 1 -1 IMvsOB_HC \
+-Abcontr 2 : 1 -1 IMvsOB_SC \
+-aBcontr 1 -1 : 1 HCvsSC_IM \
+-aBcontr 1 -1 : 2 HCvsSC_OB \
+-aBcontr 1  0 : 1 HC_IM \
+-aBcontr 0  1 : 1 SC_IM \
+-aBcontr 1  0 : 2 HC_OB \
+-aBcontr 0  1 : 2 SC_OB \
+-bucket ANOVA-${site}.nii.gz
+
+EOF
 
     chmod 755 ${filename}
 done
