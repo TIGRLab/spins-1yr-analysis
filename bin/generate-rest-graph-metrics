@@ -1,0 +1,5 @@
+#!/bin/bash
+if os.path.isfile(os.path.join(base_path, 'qc/phantom/fmri/', subj + '.csv')) == False:
+    cmd = (r"addpath(genpath('{}')); compute_fbirn('{}','{}','{}')".format(assets, base_path, subj,phantom)) 
+    os.system('matlab -nodisplay -nosplash -r "' + cmd + '"')
+
