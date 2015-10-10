@@ -1,6 +1,5 @@
 %% reads in a correlation matrix CSV and uses BCT to generate graph metrics.
-addpath(genpath('/projects/jdv/data/spins/1yr/outputs/bin/includes'));
-sparsity = [0.01:0.01:0.20];
+%addpath(genpath('/projects/jdv/data/spins/1yr/outputs/bin/includes'));
 
 % degree
 % regional efficiency / global efficiency
@@ -10,36 +9,45 @@ sparsity = [0.01:0.01:0.20];
 % degree distribution paramaters (scale free?)
 
 % init output datamat
-data = zeros(length(sparsity), 3);
-G = dlmread(filename, ',');
+
+function gen_metrics(filename, outputname);
+
+sparsity = [0.01:0.01:0.20];
+data = zeros(length(sparsity), 9);
+G= dlmread(filename, ',');
+nnodes = length(G);
+G(1:nnodes+1:nnodes*nnodes) = 0;
+sparsecount = 1;
 
 for sparse = sparsity;
+
+    % collect mean and variance of connectivity
+    connmean = mean(mean(G)); % metric 1
+    connvar = mean(var(G)); % metric 2
 
     % binarize at some sparsity
     g = threshold_proportional(G, sparse);
     g(g > 0) = 1;
-    nnodes = length(g);
-    g(1:nnodes+1:nnodes*nnodes) = 0;
 
     % degree distribution numbers
     deg = degrees_und(g);
-    degvar = var(deg);  % metric 1
-    degpl = plfit(deg); % metric 2
+    degvar = var(deg);  % metric 3
+    degpl = plfit(deg); % metric 4
 
     % efficiency
-    eff = efficiency_bin(g); % metric 3
+    eff = efficiency_bin(g); % metric 5
 
     % mean clustering coefficient
-    kcoefg = mean(clustering_coef_bu(g)); % metric 4
+    kcoefg = mean(clustering_coef_bu(g)); % metric 6
 
     % small worldness
     r = randomizer_bin_und(g, 1);
-    
+
     pthlng = 1/eff;
     pthlnr = 1/efficiency_bin(r);
     kcoefr = mean(clustering_coef_bu(r));
 
-    smwrld = (kcoefg / kcoefr) / (pthlnr / pthlng); % metric 5
+    smwrld = (kcoefg / kcoefr) / (pthlnr / pthlng); % metric 7
 
     % robustness (targeted and random)
     rbstt = zeros(nnodes, 1);
@@ -47,7 +55,7 @@ for sparse = sparsity;
 
     g_t = g; % targeted
     g_r = g; % random
-    
+
     idx_r = 1:nnodes;
 
     for n = 1:nnodes;
@@ -59,7 +67,6 @@ for sparse = sparsity;
         % for tageted attack, remove the (a) node with the largest cluster coef
         k = clustering_coef_bu(g_t); % clustering coefficient of each node
         idx_t = find(k == max(k));
-        disp(max(k))
         if length(idx_t) > 1;
             idx_t = idx_t(1);
         end
@@ -75,10 +82,10 @@ for sparse = sparsity;
 
     end
 
-    rbstt = trapz(rbstt); % metric 6
-    rbstr = trapz(rbstr); % metric 7
+    rbstt = trapz(rbstt); % metric 8
+    rbstr = trapz(rbstr); % metric 9
 
-% % calculate characteristic path length, global efficiency
+    % % calculate characteristic path length, global efficiency
     % dist = distance_bin(G);
     % [l, e] = charpath(dist);
 
@@ -86,48 +93,43 @@ for sparse = sparsity;
     % data(subj, 2) = e;
 
     % calculate average clustering coefficient
-    c = mean(clustering_coef_bu(G));
-    data(subj, 1) = c;
+    %c = mean(clustering_coef_bu(G));
+    %data(subj, 1) = c;
 
     % calculate transivity
-    t = transitivity_bu(G);
-    data(subj, 2) = t;
+    %t = transitivity_bu(G);
+    %data(subj, 2) = t;
 
     % assortativity
-    r = assortativity_bin(G, 0);
-    data(subj, 3) = r;
+    %r = assortativity_bin(G, 0);
+    %data(subj, 3) = r;
+
+    % load values into output array
+
+
+    data(sparsecount, 1) = connmean;  
+    data(sparsecount, 2) = connvar; 
+    data(sparsecount, 3) = degvar; 
+    data(sparsecount, 4) = degpl; 
+    data(sparsecount, 5) = eff; 
+    data(sparsecount, 6) = kcoefg; 
+    data(sparsecount, 7) = smwrld; 
+    data(sparsecount, 8) = rbstt; 
+    data(sparsecount, 9) = rbstr; 
+
+    sparsecount = sparsecount + 1;
 
 end
 
-for i = 1:3;
-	subplot(3,1,i);
+% write out file
+header='conn-mean,conn-var,ddist-var,ddist-plaw,eff,ddist-mean,smworld,robtarget,robrandom\n';
+%fmt = repmat('%s,', 1, length(header));
+fid = fopen(outputname, 'w');
+%fprintf(fid, fmt, header{:});
+fprintf(fid, header);
+fclose(fid);
 
-	a_ind = [1,4,7];
-	b_ind = [2,5,8];
-	c_ind = [3,6,9];
-	a = data(a_ind, i);
-	b = data(b_ind, i);
-	c = data(c_ind, i);
-	plot(1:3, a, 'color', 'red', 'linewidth', 2); hold all;
-	plot(1:3, b, 'color', 'black', 'linewidth', 2);
-	plot(1:3, c, 'color', 'green', 'linewidth', 2); hold off;
-	set(gca, 'XTick', 1:3)
+dlmwrite(outputname, data, '-append', 'delimiter', ',');
 
-	if i == 1;
-        title('Average Clustering Coefficient')
-	end
-
-	if i == 2;
-	    title('Transitivitiy')
-	end
-
-	if i == 3;
-        title('Assortativity')
-        set(gca, 'XTickLabel', {'CMH', 'MRC', 'ZHH'});
-	end
+exit
 end
-
-for i = 1:9;
-    subplot(3,3,i);
-
-

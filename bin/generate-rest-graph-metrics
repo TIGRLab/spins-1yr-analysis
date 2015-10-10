@@ -1,5 +1,12 @@
 #!/bin/bash
-if os.path.isfile(os.path.join(base_path, 'qc/phantom/fmri/', subj + '.csv')) == False:
-    cmd = (r"addpath(genpath('{}')); compute_fbirn('{}','{}','{}')".format(assets, base_path, subj,phantom)) 
-    os.system('matlab -nodisplay -nosplash -r "' + cmd + '"')
+
+mpath='/projects/jdv/data/spins/1yr/outputs/bin'
+
+while read line; do
+    matlab -nodisplay -nosplash -r "addpath(genpath('"${mpath}"')); gen_metrics('"${line}"_01_graph.csv', '"${line}"_01_METRICS.csv')"
+done < ../../outputs/bin/list_im-h-allsites.csv
+
+while read line; do
+    matlab -nodisplay -nosplash -r "addpath(genpath('"${mpath}"')); gen_metrics('"${line}"_01_graph.csv', '"${line}"_01_METRICS.csv')"
+done < ../../outputs/bin/list_im-p-allsites.csv
 
