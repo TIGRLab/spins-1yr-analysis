@@ -17,22 +17,6 @@ for site in ${sites[@]}; do
         echo "    "${line}" "${line}'_01_CORR.nii.gz \' >> ${filename}
     done < list_im-p-${site}.csv
     echo '    -prefix ttest_HC-SZ_corr-'${site}'.nii.gz' >> ${filename} 
-    
-    # healthy
-    echo '' >> ${filename}
-    echo '3dttest++ -setA healthy \' >> ${filename}
-    while read line; do 
-        echo "    "${line}" "${line}'_01_CORR.nii.gz \' >> ${filename}
-    done < list_im-h-${site}.csv
-    echo '    -prefix ttest_HC_corr-'${site}'.nii.gz' >> ${filename} 
-    
-    # schizophrenia
-    echo '' >> ${filename}
-    echo '3dttest++ -setA schizophrenia \' >> ${filename}
-    while read line; do 
-        echo "    "${line}" "${line}'_01_CORR.nii.gz \' >> ${filename}
-    done < list_im-p-${site}.csv
-    echo '    -prefix ttest_SZ_corr-'${site}'.nii.gz' >> ${filename}
 
     chmod 755 ${filename}
 done

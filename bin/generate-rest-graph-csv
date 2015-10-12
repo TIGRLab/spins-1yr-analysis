@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# init file
+filename='rest-graph-metrics.csv'
+echo 'id,dx,site,conn-mean,conn-var,ddist-var,ddist-plaw,eff,ddist-mean,smworld,robtarget,robrandom' > ${filename}
+
+# healthy controls
+while read line; do
+    data=$(cat ${line}_01_METRICS.csv | head -11 | tail -1)
+    site=$(echo ${line} | cut -d '_' -f 2)
+    echo ${line}',h,'${site}','${data} >> ${filename}
+done < ../bin/list_im-h-allsites.csv
+
+# patients                                                              
+while read line; do                                                             
+    data=$(cat ${line}_01_METRICS.csv | head -11 | tail -1)                     
+    site=$(echo ${line} | cut -d '_' -f 2)                                      
+    echo ${line}',p,'${site}','${data} >> ${filename} 
+done < ../bin/list_im-p-allsites.csv
+
