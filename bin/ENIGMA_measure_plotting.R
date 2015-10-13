@@ -470,3 +470,36 @@ ggplot(subset(alleffects,site=='pooled'), aes(y=cohen.D, x=Region)) +
 
 ggsave("ENIGMAvolumes_horizpplot.pdf", width=9, height=7)
 
+###################### Now for ENIGMA dti measures
+FAresults <- read.csv("../dti/data/enigmaDTI-FA-results.csv")
+FAvars <- names(FAresults)[2:length(names(FAresults))]
+FA_average_col <- grep('Average', FAvars, value = T)
+FA_LandRrois <- c(grep('.L_', FAvars, value = T),grep('.R_', FAvars, value = T))
+PooledRois <- setdiff(FAvars,c(FA_LandRrois,FA_average_col))
+
+ENIGMA_look_up_table <- read.delim("/projects/edickie/code/hcp_extras/templates/ENIGMA_look_up_table.txt", header=FALSE)
+names(ENIGMA_look_up_table) <-c('key','name','X1','description')
+
+FAvars_noFA <-gsub('_FA','',FAvars, fixed=T)
+FAvars_noFA <-gsub('.','-',FAvars_noFA, fixed=T)
+
+Skelvars <- intersect(FAvars_noFA,as.character(ENIGMA_look_up_table$name))
+Skelvars_FAed <- paste0(gsub('-','.',Skelvars, fixed=T),'_FA')
+
+## merge down the one's from the list
+FAresults <- merge(subjects, FAresults, by.x = "SubjID", by.y = "id")
+
+##melt
+FAskel.melted <- melt(FAresults[,c(names(subjects),Skelvars_FAed)],
+                             id.vars=c(names(subjects)),
+                             measure.vars=Skelvars_FAed,
+                             variable.name="ROI",
+                             value.name="FA")
+
+FAskel.melted <- residualize.nested(FAskel.melted,"site","ROI",'FA ~ 1','FA_resid') 
+ttestres_FA_pooled = ttestpvals(FAskel.melted,'ROI','FA ~ Dx')
+ttestres_FAresid_pooled = ttestpvals(FAskel.melted,'ROI','FA_resid ~ Dx')
+ttestres_FAresid_pooled$ROI = gsub('_FA','',row.names(ttestres_FAresid_pooled), fixed=T)
+ttestres_FAresid_pooled$ROI = gsub('.','-',ttestres_FAresid_pooled$ROI, fixed=T)
+ttestres_FAresid_pooled <- ttestres_FAresid_pooled[ ,c("ROI",names(ttestres_FAresid_pooled)[1:9])]
+write.csv(ttestres_FAresid_pooled,"ttestres_FAresid_allsites.csv",row.names = F)
