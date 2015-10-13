@@ -27,29 +27,30 @@ subjects$site[grep('MRC',as.character(subjects$SubjID))]<-"MRC"
 subjects$site <- as.factor(subjects$site)
 
 subjects <- subjects[,c("SubjID","Dx","site")]
+subjects <- subset(subjects, !is.na(subjects$Dx))
 
 
 ### run a linear model in each site to residulized for ICV and Site
 #take the orig matrix and set the cols from colnames to NA before we start
 # get the start
 
-
-residualize_ICV <- function(df,colnames) {
-  ## define a new dataframe
-  results_df<-df
-  results_df[ ,c(colnames)] <- NA
-  ### run many models  
-  ICV_lm <- lapply(colnames, function(x) {
-    form <-as.formula(paste0(x, '~ 1 + ICV'))
-    lm(form, data=df)
-  })
-  ## output the residuals into a dataframe
-  for (i in 1:length(colnames)){
-    results_df[ ,c(colnames[i])] <- ICV_lm[[i]]$residuals
-  } 
-  ## return the results
-  return(results_df)
-}
+### my old residualize - works on data in wide format - not going to use it here
+# residualize_ICV <- function(df,colnames) {
+#   ## define a new dataframe
+#   results_df<-df
+#   results_df[ ,c(colnames)] <- NA
+#   ### run many models  
+#   ICV_lm <- lapply(colnames, function(x) {
+#     form <-as.formula(paste0(x, '~ 1 + ICV'))
+#     lm(form, data=df)
+#   })
+#   ## output the residuals into a dataframe
+#   for (i in 1:length(colnames)){
+#     results_df[ ,c(colnames[i])] <- ICV_lm[[i]]$residuals
+#   } 
+#   ## return the results
+#   return(results_df)
+# }
 
 # t-tests http://stats.stackexchange.com/questions/128894/p-value-correction-for-multiple-t-tests
 ## note this is expecting your data to already be melted so that splitvar is the old column names...
@@ -66,6 +67,9 @@ ttestpvals <- function(df, splitvar, ttestformula) {
   coD = do.call("rbind", 
                     lapply(split(df, df[ ,c(splitvar)]), 
                            function(x) cohen.d(myformula,x,hedges.correction=TRUE)$estimate))
+  coDSE = do.call("rbind", 
+                lapply(split(df, df[ ,c(splitvar)]), 
+                       function(x) cohen.d(myformula,x,hedges.correction=TRUE)$var))
   t.ttest = do.call("rbind", 
                     lapply(split(df, df[ ,c(splitvar)]), 
                            function(x) t.test(myformula,x)$statistic))
@@ -76,11 +80,11 @@ ttestpvals <- function(df, splitvar, ttestformula) {
                     lapply(split(df, df[ ,c(splitvar)]), 
                            function(x) t.test(myformula,x)$p.value))
   n.ttest = do.call("rbind", lapply(split(df, df[ ,c(splitvar)]), nrow))
-  p.ttest = cbind(coD,t.ttest, df.ttest, p.ttest, 
+  p.ttest = cbind(coD, coDSE,t.ttest, df.ttest, p.ttest, 
                   p.adjust(p.ttest, method="fdr"), 
                   p.adjust(p.ttest, method="bonferroni"),
                   n.ttest)
-  colnames(p.ttest) = c('cohen.D','tstat','df',"raw", "fdr", "bonferroni","n")
+  colnames(p.ttest) = c('cohen.D','cohenD.se','tstat','df',"raw", "fdr", "bonferroni","n")
   p.ttest = as.data.frame(p.ttest)
   p.ttest$p0.05 = ifelse(p.ttest$fdr < 0.05, T, F)
   return(p.ttest)
@@ -192,6 +196,29 @@ run_nestedDxlm_and_plot <- function(dataframe.melted,yvarname, saveplot=TRUE, pd
   return(results_df)
 }
 
+### function to pool L and R roi's 
+# this need the data in wide format - do this before melting
+# df = volumesplussurf
+# idvars = names(subjects)
+# roivars = setdiff(names(df),names(subjects))
+
+sumLeftandRight <- function(df,idvars,roivars) {
+  LeftNames <-grep('L',roivars,value=T)
+  results = df
+  pooledvars = c()
+  for (lname in LeftNames) {
+    if (substr(lname,1,1) == 'L') {
+      pooledname = substr(lname,2,nchar(lname))
+      rname = paste0('R',pooledname)
+      results$pooledvar = results[,c(lname)]+resutls[,c(rname)]
+      names(results)[names(results)=='pooledvar'] <- pooledname
+      pooledvars = c(pooledvars, pooledname) 
+    }
+  }
+  results <- results[ ,c(idvars, pooledvars)]
+  return(results)
+}
+
 
 
 ################################## now for thinkness
@@ -216,18 +243,18 @@ thickness.melted$TotalThickness <- thickness.melted$LThickness + thickness.melte
 thickness.melted <- residualize.nested(thickness.melted,"site","ROI",'Thickness ~ 1 + TotalThickness','Thickness_Totalresid') 
 
 ## run linear models on everybody - with wite, within ROI
-results_thickness_raw <- run_nestedDxlm_and_plot(thickness.melted,"Thickness", pdfwidth=20,pdfheight=8)
-results_thickness_residicv <- run_nestedDxlm_and_plot(thickness.melted,"Thickness_ICVresid", pdfwidth=20,pdfheight=8)
-results_thickness_residtotal <- run_nestedDxlm_and_plot(thickness.melted,"Thickness_Totalresid", pdfwidth=20,pdfheight=8)
+results_thickness_raw <- run_nestedDxlm_and_plot(thickness.melted,"Thickness", save=F, pdfwidth=20,pdfheight=8)
+results_thickness_residicv <- run_nestedDxlm_and_plot(thickness.melted,"Thickness_ICVresid", save=F, pdfwidth=20,pdfheight=8)
+results_thickness_residtotal <- run_nestedDxlm_and_plot(thickness.melted,"Thickness_Totalresid", save=F, pdfwidth=20,pdfheight=8)
 
 # run ttests on everybody  - pooling across sites 
 ttestres_thickness_raw = ttestpvals(thickness.melted,'ROI','Thickness ~ Dx')
 ttestres_thickness_residicv = ttestpvals(thickness.melted,'ROI','Thickness_ICVresid ~ Dx')                                           
 ttestres_thickness_residtotal = ttestpvals(thickness.melted,'ROI','Thickness_Totalresid ~ Dx') 
 
-write.csv(ttestres_thickness_raw,'ttestres_thickness_raw.csv')
-write.csv(ttestres_thickness_residicv,'ttestres_thickness_residicv.csv')
-write.csv(ttestres_thickness_residtotal,'ttestres_thickness_residtotal.csv')
+# write.csv(ttestres_thickness_raw,'ttestres_thickness_raw.csv')
+# write.csv(ttestres_thickness_residicv,'ttestres_thickness_residicv.csv')
+# write.csv(ttestres_thickness_residtotal,'ttestres_thickness_residtotal.csv')
 
 
 ################################## now for Surface Area
@@ -261,9 +288,9 @@ ttestres_surfarea_raw = ttestpvals(surfarea.melted,'ROI','SurfArea ~ Dx')
 ttestres_surfarea_residicv = ttestpvals(surfarea.melted,'ROI','SurfArea_ICVresid ~ Dx')                                           
 ttestres_surfarea_residtotal = ttestpvals(surfarea.melted,'ROI','SurfArea_Totalresid ~ Dx') 
 
-write.csv(ttestres_surfarea_raw,'ttestres_surfarea_raw.csv')
-write.csv(ttestres_surfarea_residicv,'ttestres_surfarea_residicv.csv')
-write.csv(ttestres_surfarea_residtotal,'ttestres_surfarea_residtotal.csv')
+# write.csv(ttestres_surfarea_raw,'ttestres_surfarea_raw.csv')
+# write.csv(ttestres_surfarea_residicv,'ttestres_surfarea_residicv.csv')
+# write.csv(ttestres_surfarea_residtotal,'ttestres_surfarea_residtotal.csv')
 
 #################the other stuff - volumes and total Thickness and Surface Area
 
@@ -286,13 +313,15 @@ volumesplussurf <- merge(volumesplussurf1,
                          by="SubjID")
 rm(volumesplussurf1)
 
+
+
 ## box plot thing of the ICV
 ggplot(volumes, aes(x=site, y=ICV, shape=Dx, fill=Dx)) +
   geom_boxplot(outlier.shape = NA) + geom_point(alpha = 0.5, position=position_jitterdodge(jitter.width=0.01))
 
 
 ### now do the melting for both
-volumessurf.melted <- melt(volumesplussurf,
+volumessurf_ICVresid.melted <- melt(volumesplussurf,
                        id.vars=c(names(subjects),'ICV'),
                        measure.vars=c(volume.ROIs,
                                       thickness.ROIs.pooled,
@@ -301,6 +330,17 @@ volumessurf.melted <- melt(volumesplussurf,
                                       'calcMeanSurfArea','TotalSurfArea'),
                        variable.name="ROI",
                        value.name="Volume")
+
+volumessurf.melted <- melt(volumesplussurf,
+                           id.vars=c(names(subjects)),
+                           measure.vars=c(volume.ROIs,
+                                          thickness.ROIs.pooled,
+                                          surfarea.ROIs.pooled,
+                                          'ICV',
+                                          'calcMeanThickness','TotalThickness',
+                                          'calcMeanSurfArea','TotalSurfArea'),
+                           variable.name="ROI",
+                           value.name="Volume")
 
 ### adding pretty labels for graphs
 volumessurf.melted$Hemisphere <- NA
@@ -317,7 +357,7 @@ volumessurf.melted$Region[grepl('hippo',volumessurf.melted$ROI)]<-'Hippocampus'
 volumessurf.melted$Region[grepl('amyg',volumessurf.melted$ROI)]<-'Amygdala'
 volumessurf.melted$Region[grepl('accumb',volumessurf.melted$ROI)]<-'Accumbens'
 
-volumessurf.melted <- residualize.nested(volumessurf.melted,"site","ROI",'Volume ~ 1 + ICV','Volume_ICVresid') 
+volumessurf_ICVresid.melted <- residualize.nested(volumessurf_ICVresid.melted,"site","ROI",'Volume ~ 1 + ICV','Volume_ICVresid') 
 
 ## run linear models on everybody - with wite, within ROI
 results_volumes_raw <- run_nestedDxlm_and_plot(volumessurf.melted,"Volume", pdfwidth=9,pdfheight=7)
@@ -325,7 +365,7 @@ results_volumes_residicv <- run_nestedDxlm_and_plot(volumessurf.melted,"Volume_I
 
 # run ttests on everybody  - pooling across sites 
 ttestres_volumes_raw = ttestpvals(volumessurf.melted,'ROI','Volume ~ Dx')
-ttestres_volumes_residICV2 = ttestpvals(volumessurf.melted,'ROI','Volume_ICVresid ~ Dx')
+ttestres_volumes_residICV2 = ttestpvals(volumessurf.melted,'ROI','Volume ~ Dx')
 # ###plot only surface area and thickness stuff
 # thick_raw_pooled <- subset(thickness.melted, 
 #                                ROI == "LThickness" | ROI == "RThickness")
@@ -364,6 +404,102 @@ ttestres_volumes_residICV2 = ttestpvals(volumessurf.melted,'ROI','Volume_ICVresi
 #   facet_wrap(~ROI) + labs(y="Surface Area (residualized for ICV)")
 # ggsave('ResidAllSurfaceArea_boxplot.png',width=6,height=5)
 
-myformula <-formula('LThickness ~ site')
-model <- lm(myformula,thickness)
-anova(model)[1,5]
+## poole the Left and Right data
+pooledVolumes <- poolLeftandRight(volumesplussurf,                  #df = volumes left and right
+                                  c(names(subjects),'ICV'),         #idvars = names(subjects) AND 'ICV
+                                  setdiff(names(df),names(subjects)))  #ROIvars is everything else..
+pooledvars <- setdiff(names(pooledVolumes),names(subjects))
+
+## 
+pooledVolumes.melted <- melt(pooledVolumes,
+                           id.vars=c(names(subjects)),
+                           measure.vars=pooledvars,
+                           variable.name="ROI",
+                           value.name="Volume")
+
+pooledVolumes.melted$Region <- NA
+pooledVolumes.melted$Region[grepl('LatVent',pooledVolumes.melted$ROI)]<-'Lateral Ventricle'
+pooledVolumes.melted$Region[grepl('thal',pooledVolumes.melted$ROI)]<-'Thalamus'
+pooledVolumes.melted$Region[grepl('caud',pooledVolumes.melted$ROI)]<-'Caudate'
+pooledVolumes.melted$Region[grepl('put',pooledVolumes.melted$ROI)]<-'Putamen'
+pooledVolumes.melted$Region[grepl('pal',pooledVolumes.melted$ROI)]<-'Palidum'
+pooledVolumes.melted$Region[grepl('hippo',pooledVolumes.melted$ROI)]<-'Hippocampus'
+pooledVolumes.melted$Region[grepl('amyg',pooledVolumes.melted$ROI)]<-'Amygdala'
+pooledVolumes.melted$Region[grepl('accumb',pooledVolumes.melted$ROI)]<-'Accumbens'
+pooledVolumes.melted$Region[grepl('ICV',pooledVolumes.melted$ROI)]<-'ICV'
+
+results_pvolumes_raw <- run_nestedDxlm_and_plot(pooledVolumes.melted,"Volume", save=F, pdfwidth=9,pdfheight=7)
+ttestres_pvolumes_raw = ttestpvals(pooledVolumes.melted,'ROI','Volume ~ Dx')
+ttestres_pvolumes_raw$site = 'pooled'
+### do separately in all site and recombine
+ttestres_pvolumes_raw_CMH = ttestpvals(subset(pooledVolumes.melted,site=='CMH'),'ROI','Volume ~ Dx')
+ttestres_pvolumes_raw_CMH$site = 'CMH'
+ttestres_pvolumes_raw_ZHH = ttestpvals(subset(pooledVolumes.melted,site=='ZHH'),'ROI','Volume ~ Dx')
+ttestres_pvolumes_raw_ZHH$site = 'ZHH'
+ttestres_pvolumes_raw_MRC = ttestpvals(subset(pooledVolumes.melted,site=='MRC'),'ROI','Volume ~ Dx')
+ttestres_pvolumes_raw_MRC$site = 'MRC'
+
+alleffects = rbind(ttestres_pvolumes_raw,ttestres_pvolumes_raw_CMH, ttestres_pvolumes_raw_ZHH, ttestres_pvolumes_raw_MRC)
+alleffects$Region <- NA
+alleffects$Region[grepl('LatVent',row.names(alleffects))]<-'Lateral Ventricle'
+alleffects$Region[grepl('thal',row.names(alleffects))]<-'Thalamus'
+alleffects$Region[grepl('caud',row.names(alleffects))]<-'Caudate'
+alleffects$Region[grepl('put',row.names(alleffects))]<-'Putamen'
+alleffects$Region[grepl('pal',row.names(alleffects))]<-'Palidum'
+alleffects$Region[grepl('hippo',row.names(alleffects))]<-'Hippocampus'
+alleffects$Region[grepl('amyg',row.names(alleffects))]<-'Amygdala'
+alleffects$Region[grepl('accumb',row.names(alleffects))]<-'Accumbens'
+alleffects$Region[grepl('ICV',row.names(alleffects))]<-'ICV'
+alleffects$Region[grepl('Thickness',row.names(alleffects))]<-'Cortical Thickness'
+alleffects$Region[grepl('SurfArea',row.names(alleffects))]<-'Cortical Surface Area'
+
+alleffects$Region <- factor(alleffects$Region, 
+                            levels = c('Cortical Thickness', 'Cortical Surface Area',
+                                       'Hippocampus', 'Amygdala', 'Thalamus', 'Accumbens',
+                                        'ICV', 'Caudate', 'Putamen', 'Palidum', 'Lateral Ventricle')[11:1])
+
+
+ggplot(subset(alleffects,site=='pooled'), aes(y=cohen.D, x=Region)) +
+  geom_errorbar(aes(ymin = (cohen.D - cohenD.se), ymax =  (cohen.D + cohenD.se)), width = 0.2) +
+  geom_point(size = 8, shape = 18) + 
+  geom_point(data=subset(alleffects,site!='pooled'), aes(y=cohen.D, x=Region, colour = site), size = 3) +
+  geom_hline(yintercept=0) +
+  scale_y_reverse() + 
+  labs(x='',y="Group Effect Size (Hedges g)") +
+  coord_flip()
+
+ggsave("ENIGMAvolumes_horizpplot.pdf", width=9, height=7)
+
+###################### Now for ENIGMA dti measures
+FAresults <- read.csv("../dti/data/enigmaDTI-FA-results.csv")
+FAvars <- names(FAresults)[2:length(names(FAresults))]
+FA_average_col <- grep('Average', FAvars, value = T)
+FA_LandRrois <- c(grep('.L_', FAvars, value = T),grep('.R_', FAvars, value = T))
+PooledRois <- setdiff(FAvars,c(FA_LandRrois,FA_average_col))
+
+ENIGMA_look_up_table <- read.delim("/projects/edickie/code/hcp_extras/templates/ENIGMA_look_up_table.txt", header=FALSE)
+names(ENIGMA_look_up_table) <-c('key','name','X1','description')
+
+FAvars_noFA <-gsub('_FA','',FAvars, fixed=T)
+FAvars_noFA <-gsub('.','-',FAvars_noFA, fixed=T)
+
+Skelvars <- intersect(FAvars_noFA,as.character(ENIGMA_look_up_table$name))
+Skelvars_FAed <- paste0(gsub('-','.',Skelvars, fixed=T),'_FA')
+
+## merge down the one's from the list
+FAresults <- merge(subjects, FAresults, by.x = "SubjID", by.y = "id")
+
+##melt
+FAskel.melted <- melt(FAresults[,c(names(subjects),Skelvars_FAed)],
+                             id.vars=c(names(subjects)),
+                             measure.vars=Skelvars_FAed,
+                             variable.name="ROI",
+                             value.name="FA")
+
+FAskel.melted <- residualize.nested(FAskel.melted,"site","ROI",'FA ~ 1','FA_resid') 
+ttestres_FA_pooled = ttestpvals(FAskel.melted,'ROI','FA ~ Dx')
+ttestres_FAresid_pooled = ttestpvals(FAskel.melted,'ROI','FA_resid ~ Dx')
+ttestres_FAresid_pooled$ROI = gsub('_FA','',row.names(ttestres_FAresid_pooled), fixed=T)
+ttestres_FAresid_pooled$ROI = gsub('.','-',ttestres_FAresid_pooled$ROI, fixed=T)
+ttestres_FAresid_pooled <- ttestres_FAresid_pooled[ ,c("ROI",names(ttestres_FAresid_pooled)[1:9])]
+write.csv(ttestres_FAresid_pooled,"ttestres_FAresid_allsites.csv",row.names = F)
