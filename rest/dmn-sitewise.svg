@@ -16,7 +16,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r"
-   sodipodi:docname="dmn-sitewise.svg">
+   sodipodi:docname="dmn-sitewise.svg"
+   inkscape:export-filename="/projects/jdv/data/spins/1yr/outputs/rest/dmn-sitewise.png"
+   inkscape:export-xdpi="140"
+   inkscape:export-ydpi="140">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -27,7 +30,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="711.65085"
+     inkscape:cx="387.39188"
      inkscape:cy="666.93635"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -61,31 +64,31 @@
      transform="translate(341.1461,-23.325047)">
     <image
        sodipodi:absref="/projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-cmh.png"
-       y="82.237183"
-       x="-112.50001"
-       id="image3344"
-       xlink:href="file:///projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-cmh.png"
-       preserveAspectRatio="none"
+       xlink:href="dmn-seed-hc-cmh.png"
+       width="945"
        height="396.25"
-       width="945" />
+       preserveAspectRatio="none"
+       id="image3344"
+       x="-112.50001"
+       y="82.237183" />
     <image
        sodipodi:absref="/projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-mrc.png"
-       y="410.48718"
-       x="-113.50001"
-       id="image3355"
-       xlink:href="file:///projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-mrc.png"
-       preserveAspectRatio="none"
+       xlink:href="dmn-seed-hc-mrc.png"
+       width="950"
        height="405"
-       width="950" />
+       preserveAspectRatio="none"
+       id="image3355"
+       x="-113.50001"
+       y="410.48718" />
     <image
        sodipodi:absref="/projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-zhh.png"
-       y="755.48718"
-       x="-115.50001"
-       id="image3366"
-       xlink:href="file:///projects/jdv/data/spins/1yr/outputs/rest/dmn-seed-hc-zhh.png"
-       preserveAspectRatio="none"
+       xlink:href="dmn-seed-hc-zhh.png"
+       width="947.5"
        height="383.75"
-       width="947.5" />
+       preserveAspectRatio="none"
+       id="image3366"
+       x="-115.50001"
+       y="755.48718" />
     <image
        y="276.6073"
        x="867.28082"

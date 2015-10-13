@@ -7,5 +7,6 @@ for subj in $(ls -d ${archivedir}/*); do
     ln -s ${subj}/*REST.01.nii.gz ${workingdir}/${subjname}_REST.nii.gz
     ln -s ${subj}/*_mask_MNI.nii.gz ${workingdir}/${subjname}_mask.nii.gz
     ln -s ${subj}/*_roi-corrs.csv ${workingdir}/${subjname}_graph.csv
+    find -L ${workingdir} -type l -delete
 done
 

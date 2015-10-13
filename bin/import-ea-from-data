@@ -6,5 +6,7 @@ for subj in $(ls -d ${archivedir}/*); do
     subjname=$(basename ${subj})
     ln -s ${subj}/*1stlevel.nii.gz ${workingdir}/${subjname}_EA.nii.gz
     ln -s ${subj}/*_mask_MNI.nii.gz ${workingdir}/${subjname}_mask.nii.gz
+    ln -s ${subj}/*corr_push.csv ${workingdir}/${subjname}_corr-push.csv
+    find -L ${workingdir} -type l -delete
 done
 
