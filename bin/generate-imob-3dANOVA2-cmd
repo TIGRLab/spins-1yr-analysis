@@ -1,5 +1,7 @@
 #!/bin/bash
 sites=( cmh zhh mrc allsites )
+subbrick=20
+
 for site in ${sites[@]}; do
 
     filename='run-glm_IMOB_'${site}'.sh'
@@ -9,17 +11,17 @@ for site in ${sites[@]}; do
 
     # add healthy subjects
     count=1
-    while read line; do 
-        echo '    -dset 1 1 '${count} ${line}'_01_IM.nii.gz[67] \' >> ${filename}
-        echo '    -dset 1 2 '${count} ${line}'_01_OB.nii.gz[67] \' >> ${filename}
+    while read line; do
+        echo '    -dset 1 1 '${count} ${line}'_01_IM.nii.gz['${subbrick}'] \' >> ${filename}
+        echo '    -dset 1 2 '${count} ${line}'_01_OB.nii.gz['${subbrick}'] \' >> ${filename}
         count=$((count+1))
     done < list_im-h-${site}.csv
 
     # add schizophrenia subjects
     count=1
-    while read line; do 
-        echo '    -dset 2 1 '${count} ${line}'_01_IM.nii.gz[67] \' >> ${filename}
-        echo '    -dset 2 2 '${count} ${line}'_01_OB.nii.gz[67] \' >> ${filename}
+    while read line; do
+        echo '    -dset 2 1 '${count} ${line}'_01_IM.nii.gz['${subbrick}'] \' >> ${filename}
+        echo '    -dset 2 2 '${count} ${line}'_01_OB.nii.gz['${subbrick}'] \' >> ${filename}
         count=$((count+1))
     done < list_im-p-${site}.csv
 
